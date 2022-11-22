@@ -1,0 +1,10 @@
+DROP TABLE IF EXISTS checkout_limit_schedules;
+DROP TABLE IF EXISTS checkout_limit_defaults;
+DROP TABLE IF EXISTS activities;
+DROP TABLE IF EXISTS schedule;
+DROP TABLE IF EXISTS limits;
+DROP TABLE IF EXISTS checkouts;
+DROP TABLE IF EXISTS members;
+DROP TABLE IF EXISTS books;
+DROP TABLE IF EXISTS book_categories;
+DROP TABLE IF EXISTS schools;

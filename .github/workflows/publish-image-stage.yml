@@ -1,0 +1,70 @@
+name: Publish container image to Amazon ECR
+
+on:
+  push:
+    tags: [ staging ]
+  workflow_dispatch:
+
+env:
+  AWS_REGION: "us-west-2"
+  ECR_REPOSITORY: "libsys/library-service"
+
+jobs:
+  build:
+    name: Build & Push to the Github Container Registry
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: 21
+          distribution: temurin
+          cache: 'maven'
+      - name: Get project version
+        run: |
+          VERSION=$( ./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout )
+          echo "PROJECT_VERSION=$VERSION" >> $GITHUB_ENV
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          mask-password: 'false'
+      - name: Set docker image env var
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_USERNAME: ${{ steps.login-ecr.outputs.docker_username_144396787599_dkr_ecr_us_west_2_amazonaws_com }}
+          ECR_PASSWORD: ${{ steps.login-ecr.outputs.docker_password_144396787599_dkr_ecr_us_west_2_amazonaws_com }}
+#        run: |
+#          echo "registryE=${ECR_REGISTRY}"
+#          echo "registryU=${ECR_USERNAME}"
+#          echo "registryP=${ECR_PASSWORD}"
+        run: |
+          echo "DOCKER_IMAGE_NAME=${ECR_REGISTRY}/${ECR_REPOSITORY}" >> $GITHUB_ENV
+      - name: Publish Image to Amazon ECR
+        env:
+          # tags need to be "[repository]/[image name]:[tag]".
+          #   e.g. <account-id>.dkr.ecr.<region>.amazonaws.com/libsys/library-service:<tag>
+          # tags: staging, <git_sha>
+          CONTAINER_IMAGE_TAGS: "${{ env.DOCKER_IMAGE_NAME }}:staging,${{ env.DOCKER_IMAGE_NAME }}:${{ github.sha }}"
+          #  private ECR registry login output format: docker_[username|password]_<account-id>_dkr_ecr_<region>_amazonaws_com
+          #  see: https://github.com/marketplace/actions/amazon-ecr-login-action-for-github-actions#docker-credentials
+          ECR_USERNAME: ${{ steps.login-ecr.outputs.docker_username_144396787599_dkr_ecr_us_west_2_amazonaws_com }}
+          ECR_PASSWORD: ${{ steps.login-ecr.outputs.docker_password_144396787599_dkr_ecr_us_west_2_amazonaws_com }}
+        #          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          ./mvnw -B -DskipTests spring-boot:build-image \
+            -Dspring-boot.build-image.publish=true \
+            -Dspring-boot.build-image.imageName="${{env.DOCKER_IMAGE_NAME}}" \
+            -Ddocker.publishRegistry.username="${{env.ECR_USERNAME}}" \
+            -Ddocker.publishRegistry.password="${{env.ECR_PASSWORD}}" \
+            -Ddocker.publishRegistry.tags="${{env.CONTAINER_IMAGE_TAGS}}"
