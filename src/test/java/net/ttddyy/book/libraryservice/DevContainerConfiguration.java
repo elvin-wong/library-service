@@ -78,8 +78,9 @@ class DevContainerConfiguration {
 	PostgreSQLContainer<?> postgreSQLContainer() {
 		// Due to the test-context cache, tests keeps connections.
 		// Need to increase the max connections for test.
-		return new PostgreSQLContainer<>("postgres:16").withReuse(true).withCommand("postgres -c max_connections=100")
-				.withCreateContainerCmdModifier((cmd) -> cmd.withName("library-service-testcontainer"));
+		return new PostgreSQLContainer<>("postgres:17").withReuse(true)
+			.withCommand("postgres -c max_connections=100")
+			.withCreateContainerCmdModifier((cmd) -> cmd.withName("library-service-testcontainer"));
 
 	}
 

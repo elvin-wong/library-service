@@ -38,7 +38,7 @@ import org.springframework.test.context.DynamicPropertySource;
 class MemberApiTests {
 
 	@Container
-	static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16");
+	static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:17");
 
 	@DynamicPropertySource
 	static void registerPostgresProperties(DynamicPropertyRegistry registry) {
