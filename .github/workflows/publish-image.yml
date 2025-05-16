@@ -35,9 +35,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish Image
-        if: ${{ false }}  # Disable publishing image
+#        if: ${{ false }}  # Disable publishing image
         run: ./mvnw -B -DskipTests spring-boot:build-image -Dspring-boot.build-image.publish=true -Dspring-boot.build-image.imageName="${{ env.DOCKER_IMAGE_NAME }}"
         env:
+          # configured to reference them in pom.xml
           DOCKER_REGISTRY_USER: ${{ github.actor }}
-          DOCKER_REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CONTAINER_IMAGE_TAGS: "${{ env.DOCKER_IMAGE_NAME }}:latest,${{ env.DOCKER_IMAGE_NAME }}:${{ env.PROJECT_VERSION }}${{ contains(env.PROJECT_VERSION, 'snapshot') && format(',{0}:snapshot', env.DOCKER_IMAGE_NAME) || ''}}"
+          DOCKER_REGISTRY_PASS: ${{ secrets.GITHUB_TOKEN }}
+#          CONTAINER_IMAGE_TAGS: "${{ env.DOCKER_IMAGE_NAME }}:latest,${{ env.DOCKER_IMAGE_NAME }}:${{ env.PROJECT_VERSION }}${{ contains(env.PROJECT_VERSION, 'snapshot') && format(',{0}:snapshot', env.DOCKER_IMAGE_NAME) || ''}}"
