@@ -27,6 +27,7 @@ import java.sql.DriverManager;
 import javax.sql.DataSource;
 
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
 
 import org.springframework.boot.autoconfigure.condition.ConditionOutcome;
 import org.springframework.boot.autoconfigure.condition.SpringBootCondition;
@@ -40,9 +41,11 @@ import org.springframework.context.annotation.ConfigurationCondition;
 import org.springframework.core.annotation.MergedAnnotations;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.type.AnnotatedTypeMetadata;
+import org.springframework.jdbc.datasource.init.CompositeDatabasePopulator;
 import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.DatabasePopulator;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+import org.springframework.jdbc.datasource.init.ScriptUtils;
 
 /**
  * @author Tadaya Tsuyukubo
@@ -78,7 +81,9 @@ class DevContainerConfiguration {
 	PostgreSQLContainer<?> postgreSQLContainer() {
 		// Due to the test-context cache, tests keeps connections.
 		// Need to increase the max connections for test.
-		return new PostgreSQLContainer<>("postgres:17").withReuse(true).withCommand("postgres -c max_connections=100");
+		return new PostgreSQLContainer<>("postgres:17").withReuse(true)
+			.withCommand("postgres -c max_connections=100")
+			.waitingFor(Wait.forListeningPort());
 		// using a static name causes re-run to fail unless removing the container.
 		// .withCreateContainerCmdModifier((cmd) ->
 		// cmd.withName("library-service-testcontainer"));
@@ -88,10 +93,17 @@ class DevContainerConfiguration {
 	// TODO: think about initialization
 	@Bean
 	DataSourceInitializer dataSourceInitializer(DataSource dataSource) {
-		ClassPathResource dropAllSql = new ClassPathResource("drop-all.sql");
-		ClassPathResource schemaSql = new ClassPathResource("schema.sql");
-		ClassPathResource dataSql = new ClassPathResource("data.sql");
-		DatabasePopulator populator = new ResourceDatabasePopulator(dropAllSql, schemaSql, dataSql);
+		// to add a separator for schema, create populator for each
+		ResourceDatabasePopulator dropAll = new ResourceDatabasePopulator(new ClassPathResource("drop-all.sql"));
+		ResourceDatabasePopulator schema = new ResourceDatabasePopulator(new ClassPathResource("schema.sql"));
+		ResourceDatabasePopulator function = new ResourceDatabasePopulator(new ClassPathResource("function.sql"));
+		ResourceDatabasePopulator trigger = new ResourceDatabasePopulator(new ClassPathResource("trigger.sql"));
+		ResourceDatabasePopulator data = new ResourceDatabasePopulator(new ClassPathResource("data.sql"));
+
+		// since function uses ';', need to define explicit separator
+		function.setSeparator(ScriptUtils.EOF_STATEMENT_SEPARATOR);
+
+		CompositeDatabasePopulator populator = new CompositeDatabasePopulator(dropAll, schema, function, trigger, data);
 
 		DataSourceInitializer dataSourceInitializer = new DataSourceInitializer();
 		dataSourceInitializer.setDataSource(dataSource);

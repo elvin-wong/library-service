@@ -84,17 +84,19 @@ CREATE TABLE checkouts
     FOREIGN KEY (book_id) REFERENCES books (id)
 );
 
-
--- Optional: uncomment if needed
--- CREATE TABLE checkout_history
--- (
---     book_id       INT  NOT NULL,
---     member_id     INT  NOT NULL,
---     checkin_date  DATE NOT NULL,
---     checkout_date DATE NOT NULL,
---     FOREIGN KEY (member_id) REFERENCES members (id),
---     FOREIGN KEY (book_id) REFERENCES books (id)
--- );
+CREATE TABLE checkouts_history
+(
+    member_id     INT,
+    book_id       INT,
+    checkout_date DATE,
+    due_date      DATE,
+    created_at    TIMESTAMP,
+    updated_at    TIMESTAMP,
+    operation     TEXT NOT NULL,       -- 'INSERT', 'UPDATE', or 'DELETE'
+    changed_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX idx_checkouts_history_member_id ON checkouts_history(member_id);
+CREATE INDEX idx_checkouts_history_book_id ON checkouts_history(book_id);
 
 CREATE TABLE limits
 (
@@ -165,54 +167,3 @@ CREATE TABLE checkout_limit_schedules
 
 -- TODO: for existing tables:
 --  * Add version column for ones that app updates
---  * Rename to id
-
-CREATE TRIGGER update_schools_updated_at
-    BEFORE UPDATE ON schools
-    FOR EACH ROW
-EXECUTE FUNCTION moddatetime(updated_at);
-
-CREATE TRIGGER update_book_categories_updated_at
-    BEFORE UPDATE ON book_categories
-    FOR EACH ROW
-EXECUTE FUNCTION moddatetime(updated_at);
-
-CREATE TRIGGER update_books_updated_at
-    BEFORE UPDATE ON books
-    FOR EACH ROW
-EXECUTE FUNCTION moddatetime(updated_at);
-
-CREATE TRIGGER update_members_updated_at
-    BEFORE UPDATE ON members
-    FOR EACH ROW
-EXECUTE FUNCTION moddatetime(updated_at);
-
-CREATE TRIGGER update_checkouts_updated_at
-    BEFORE UPDATE ON checkouts
-    FOR EACH ROW
-EXECUTE FUNCTION moddatetime(updated_at);
-
-CREATE TRIGGER update_limits_updated_at
-    BEFORE UPDATE ON limits
-    FOR EACH ROW
-EXECUTE FUNCTION moddatetime(updated_at);
-
-CREATE TRIGGER update_schedule_updated_at
-    BEFORE UPDATE ON schedules
-    FOR EACH ROW
-EXECUTE FUNCTION moddatetime(updated_at);
-
-CREATE TRIGGER update_activities_updated_at
-    BEFORE UPDATE ON activities
-    FOR EACH ROW
-EXECUTE FUNCTION moddatetime(updated_at);
-
-CREATE TRIGGER update_checkout_limit_defaults_updated_at
-    BEFORE UPDATE ON checkout_limit_defaults
-    FOR EACH ROW
-EXECUTE FUNCTION moddatetime(updated_at);
-
-CREATE TRIGGER update_checkout_limit_schedules_updated_at
-    BEFORE UPDATE ON checkout_limit_schedules
-    FOR EACH ROW
-EXECUTE FUNCTION moddatetime(updated_at);
