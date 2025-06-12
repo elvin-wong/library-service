@@ -61,7 +61,7 @@ class CheckoutHistoryControllerDBTests {
 		String sql;
 		// members
 		sql = """
-					INSERT INTO members (id, firstname_en, lastname_en, firstname, lastname, school, grade)
+					INSERT INTO members (id, firstname_en, lastname_en, firstname, lastname, school_id, grade)
 					VALUES	(10, 'foo', 'foo', 'FOO', 'FOO', 'sky', 7),
 							(20, 'bar', 'bar', 'BAR', 'BAR', 'ocean', 2);
 				""";

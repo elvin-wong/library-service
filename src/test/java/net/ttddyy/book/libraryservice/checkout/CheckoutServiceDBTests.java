@@ -67,7 +67,7 @@ class CheckoutServiceDBTests {
 		String sql;
 		// members
 		sql = """
-					INSERT INTO members (id, firstname_en, lastname_en, school, grade)
+					INSERT INTO members (id, firstname_en, lastname_en, school_id, grade)
 					VALUES	(10, 'foo', 'foo', 'sky', 7),
 							(20, 'bar', 'bar', 'ocean', 2);
 				""";
@@ -114,7 +114,7 @@ class CheckoutServiceDBTests {
 		String sql;
 		// members
 		sql = """
-					INSERT INTO members (id, firstname_en, lastname_en, school, grade)
+					INSERT INTO members (id, firstname_en, lastname_en, school_id, grade)
 					VALUES	(10, 'foo', 'foo', 'sky', 7),
 							(20, 'bar', 'bar', 'ocean', 2);
 				""";
@@ -144,7 +144,7 @@ class CheckoutServiceDBTests {
 		String sql;
 		// members
 		sql = """
-					INSERT INTO members (id, firstname_en, lastname_en, school, grade)
+					INSERT INTO members (id, firstname_en, lastname_en, school_id, grade)
 					VALUES	(10, 'foo', 'foo', 'sky', 7),
 							(20, 'bar', 'bar', 'ocean', 2),
 							(30, 'baz', 'baz', 'ocean', 3);

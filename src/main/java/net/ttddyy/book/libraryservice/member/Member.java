@@ -41,7 +41,7 @@ public class Member {
 	@Column(name = "active")
 	private Boolean active;
 
-	@Column(name = "school")
+	@Column(name = "school_id")
 	private String schoolId;
 
 	private Integer classNumber;

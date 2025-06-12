@@ -65,7 +65,7 @@ CREATE TABLE members
      lastname_en  VARCHAR(64) NOT NULL,
      firstname    VARCHAR(64),
      lastname     VARCHAR(64),
-     school       VARCHAR(8),
+     school_id    VARCHAR(8),
      updated_at   TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
