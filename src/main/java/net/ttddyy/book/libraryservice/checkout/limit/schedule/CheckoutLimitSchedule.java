@@ -30,7 +30,7 @@ import jakarta.persistence.Version;
 /**
  * @author Tadaya Tsuyukubo
  */
-@Entity(name = "checkout_limit_schedule")
+@Entity
 @Table(name = "checkout_limit_schedules")
 public class CheckoutLimitSchedule {
 

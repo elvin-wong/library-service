@@ -30,14 +30,13 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
 import net.ttddyy.book.libraryservice.book.Book;
-import net.ttddyy.book.libraryservice.checkout.CheckoutId;
 import net.ttddyy.book.libraryservice.member.Member;
 import org.hibernate.annotations.Immutable;
 
 /**
  * @author Tadaya Tsuyukubo
  */
-@Entity(name = "checkoutHistory")
+@Entity
 @Table(name = "checkouts_history")
 @Immutable
 public class CheckoutHistory {

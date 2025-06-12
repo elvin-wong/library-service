@@ -27,7 +27,7 @@ import jakarta.persistence.Version;
 /**
  * @author Tadaya Tsuyukubo
  */
-@Entity(name = "checkout_limit_default")
+@Entity
 @Table(name = "checkout_limit_defaults")
 public class CheckoutLimitDefault {
 

@@ -26,7 +26,7 @@ import jakarta.persistence.Table;
 /**
  * @author Tadaya Tsuyukubo
  */
-@Entity(name = "member")
+@Entity
 @Table(name = "members")
 public class Member {
 

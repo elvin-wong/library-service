@@ -31,7 +31,7 @@ import jakarta.persistence.Version;
 /**
  * @author Tadaya Tsuyukubo
  */
-@Entity(name = "activity")
+@Entity
 @Table(name = "activities")
 public class Activity {
 

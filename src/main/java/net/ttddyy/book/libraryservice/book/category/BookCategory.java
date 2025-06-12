@@ -37,7 +37,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Tadaya Tsuyukubo
  */
-@Entity(name = "category")
+@Entity(name = "Category")
 @Table(name = "book_categories")
 public class BookCategory {
 

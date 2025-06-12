@@ -33,7 +33,7 @@ import net.ttddyy.book.libraryservice.member.Member;
 /**
  * @author Tadaya Tsuyukubo
  */
-@Entity(name = "checkout")
+@Entity
 @Table(name = "checkouts")
 public class Checkout {
 

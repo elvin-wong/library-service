@@ -30,19 +30,19 @@ import org.springframework.lang.Nullable;
 @org.springframework.stereotype.Repository
 public interface CheckoutHistoryRepository extends Repository<CheckoutHistory, CheckoutHistoryId> {
 
-	@Query(value = "SELECT co FROM checkoutHistory co LEFT JOIN FETCH co.member LEFT JOIN FETCH co.book WHERE co.book.id = :bookId",
-			countQuery = "SELECT count(co) FROM checkoutHistory co WHERE co.book.id = :bookId")
+	@Query(value = "SELECT co FROM CheckoutHistory co LEFT JOIN FETCH co.member LEFT JOIN FETCH co.book WHERE co.book.id = :bookId",
+			countQuery = "SELECT count(co) FROM CheckoutHistory co WHERE co.book.id = :bookId")
 	Page<CheckoutHistory> findAllByBookId(@Param("bookId") long bookId, Pageable pageable);
 
-	@Query(value = "SELECT co FROM checkoutHistory co LEFT JOIN FETCH co.member LEFT JOIN FETCH co.book WHERE co.member.id = :memberId",
-			countQuery = "SELECT count(co) FROM checkoutHistory co WHERE co.member.id = :memeberId")
+	@Query(value = "SELECT co FROM CheckoutHistory co LEFT JOIN FETCH co.member LEFT JOIN FETCH co.book WHERE co.member.id = :memberId",
+			countQuery = "SELECT count(co) FROM CheckoutHistory co WHERE co.member.id = :memeberId")
 	Page<CheckoutHistory> findAllByMemberId(@Param("memberId") long memberId, Pageable pageable);
 
 	// TODO: book entity has eager association to book-category. If not specifying the
 	// join, query doesn't fetch it and causes extra query to get it.
 	// Once eager association is fixed, the join fetch should be removed as the history
 	// dto doesn't use it.
-	@Query("FROM checkoutHistory history LEFT JOIN FETCH history.book LEFT JOIN FETCH history.book.category LEFT JOIN FETCH history.member WHERE history.id = :id")
+	@Query("FROM CheckoutHistory history LEFT JOIN FETCH history.book LEFT JOIN FETCH history.book.category LEFT JOIN FETCH history.member WHERE history.id = :id")
 	@Nullable
 	CheckoutHistory findById(CheckoutHistoryId id);
 

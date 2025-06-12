@@ -27,7 +27,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long>, ListQueryByExampleExecutor<Book> {
 
-	@Query("SELECT CASE WHEN (max(id) IS NULL ) THEN :start ELSE max(id) + 1 END FROM book WHERE id BETWEEN :start AND :end")
+	@Query("SELECT CASE WHEN (max(id) IS NULL ) THEN :start ELSE max(id) + 1 END FROM Book WHERE id BETWEEN :start AND :end")
 	long nextId(long start, long end);
 
 }

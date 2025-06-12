@@ -34,7 +34,7 @@ import org.springframework.lang.Nullable;
 /**
  * @author Tadaya Tsuyukubo
  */
-@Entity(name = "book")
+@Entity
 @Table(name = "books")
 public class Book {
 

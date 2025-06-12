@@ -30,7 +30,7 @@ import jakarta.persistence.Version;
  *
  * @author Tadaya Tsuyukubo
  */
-@Entity(name = "school")
+@Entity
 @Table(name = "schools")
 public class School {
 

@@ -36,27 +36,27 @@ public interface CheckoutRepository extends CrudRepository<Checkout, CheckoutId>
 
 	long countByIdMemberId(long memberId);
 
-	@Query(value = "SELECT co FROM checkout co LEFT JOIN FETCH co.member LEFT JOIN FETCH co.book",
-			countQuery = "SELECT count(co) FROM checkout co")
+	@Query(value = "SELECT co FROM Checkout co LEFT JOIN FETCH co.member LEFT JOIN FETCH co.book",
+			countQuery = "SELECT count(co) FROM Checkout co")
 	Page<Checkout> findAll(Pageable pageable);
 
-	@Query(value = "SELECT co FROM checkout co LEFT JOIN FETCH co.member LEFT JOIN FETCH co.book where co.member.id = :memberId",
-			countQuery = "SELECT count(co) FROM checkout co WHERE co.member.id = :memeberId")
+	@Query(value = "SELECT co FROM Checkout co LEFT JOIN FETCH co.member LEFT JOIN FETCH co.book where co.member.id = :memberId",
+			countQuery = "SELECT count(co) FROM Checkout co WHERE co.member.id = :memeberId")
 	Page<Checkout> findAllByMemberId(@Param("memberId") long memberId, Pageable pageable);
 
-	@Query(value = "SELECT co FROM checkout co LEFT JOIN FETCH co.member LEFT JOIN FETCH co.book where co.book.schoolId = :schoolId",
-			countQuery = "SELECT count(co) FROM checkout co LEFT JOIN co.book where co.book.schoolId = :schoolId")
+	@Query(value = "SELECT co FROM Checkout co LEFT JOIN FETCH co.member LEFT JOIN FETCH co.book where co.book.schoolId = :schoolId",
+			countQuery = "SELECT count(co) FROM Checkout co LEFT JOIN co.book where co.book.schoolId = :schoolId")
 	Page<Checkout> findAllBySchoolId(@Param("schoolId") String schoolId, Pageable pageable);
 
 	@Modifying
-	@Query("DELETE FROM checkout co WHERE co.id.bookId in :bookIds")
+	@Query("DELETE FROM Checkout co WHERE co.id.bookId in :bookIds")
 	void deleteAllByIdBookIdIn(Iterable<Long> bookIds);
 
-	@Query("FROM checkout co JOIN FETCH co.book WHERE co.member.id = :memberId")
+	@Query("FROM Checkout co JOIN FETCH co.book WHERE co.member.id = :memberId")
 	List<Checkout> bookDetailsByMemberId(long memberId);
 
-	@Query(value = "SELECT co FROM checkout co LEFT JOIN FETCH co.member LEFT JOIN FETCH co.book WHERE co.dueDate < :dueDate",
-			countQuery = "SELECT count(co) FROM checkout co WHERE co.dueDate < :dueDate")
+	@Query(value = "SELECT co FROM Checkout co LEFT JOIN FETCH co.member LEFT JOIN FETCH co.book WHERE co.dueDate < :dueDate",
+			countQuery = "SELECT count(co) FROM Checkout co WHERE co.dueDate < :dueDate")
 	Page<Checkout> findOverdue(@Param("dueDate") LocalDate dueDate, Pageable pageable);
 
 }
