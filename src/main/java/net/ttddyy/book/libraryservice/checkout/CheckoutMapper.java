@@ -16,13 +16,12 @@
 
 package net.ttddyy.book.libraryservice.checkout;
 
-import java.util.List;
-
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
-
 import org.springframework.data.domain.Page;
+
+import java.util.List;
 
 /**
  * @author Tadaya Tsuyukubo
@@ -34,7 +33,6 @@ public interface CheckoutMapper {
 
 	@Mapping(target = "bookId", source = "book.id")
 	@Mapping(target = "memberId", source = "member.id")
-	@Mapping(target = ".", source = "book")
 	CheckoutDto toDto(Checkout checkout);
 
 	List<CheckoutDto> toDtoList(List<Checkout> entities);

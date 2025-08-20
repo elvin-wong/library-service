@@ -66,13 +66,15 @@ class CheckoutMapperTests {
 		assertThat(dto.memberId()).isEqualTo(memberId);
 		assertThat(dto.checkoutDate()).isEqualTo("2020-02-02");
 		assertThat(dto.dueDate()).isEqualTo("2020-03-03");
-		assertThat(dto.title()).isEqualTo("foo-title");
-		assertThat(dto.titleKana()).isEqualTo("foo-title-kana");
-		assertThat(dto.author()).isEqualTo("foo-author");
-		assertThat(dto.authorKana()).isEqualTo("foo-author-kana");
-		assertThat(dto.isbn()).isEqualTo("foo-isbn");
-		assertThat(dto.comments()).isEqualTo("foo-comments");
-		assertThat(dto.publisher()).isEqualTo("foo-publisher");
+		assertThat(dto.book()).satisfies(bookDto -> {
+			assertThat(bookDto.title()).isEqualTo("foo-title");
+			assertThat(bookDto.titleKana()).isEqualTo("foo-title-kana");
+			assertThat(bookDto.author()).isEqualTo("foo-author");
+			assertThat(bookDto.authorKana()).isEqualTo("foo-author-kana");
+			assertThat(bookDto.isbn()).isEqualTo("foo-isbn");
+			assertThat(bookDto.comments()).isEqualTo("foo-comments");
+			assertThat(bookDto.publisher()).isEqualTo("foo-publisher");
+		});
 	}
 
 }

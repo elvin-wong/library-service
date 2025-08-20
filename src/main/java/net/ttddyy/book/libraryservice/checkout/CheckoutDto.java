@@ -27,13 +27,20 @@ public record CheckoutDto(
 		long memberId,
 		LocalDate checkoutDate,
 		LocalDate dueDate,
-		String title,
-		String titleKana,
-		String author,
-		String authorKana,
-		String isbn,
-		String comments,
-		String publisher
+        Book book
 // @formatter:on
 ) {
+	record Book(
+// @formatter:off
+            String title,
+            String titleKana,
+            String author,
+            String authorKana,
+            String isbn,
+            String comments,
+            String publisher
+// @formatter:on
+	) {
+	}
+
 }
