@@ -40,6 +40,7 @@ class ApplicationSecurityConfiguration {
 			matchers.requestMatchers(EndpointRequest.toAnyEndpoint());
 		}).authorizeHttpRequests(authz -> {
 			authz.requestMatchers(EndpointRequest.to(HealthEndpoint.class)).permitAll();
+			authz.requestMatchers("/api/schools").permitAll();
 			authz.anyRequest().authenticated();
 		});
 		http.csrf().disable(); // need for POST requests
