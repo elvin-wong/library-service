@@ -18,6 +18,11 @@ package net.ttddyy.book.libraryservice.checkout.limit;
 
 import java.time.Clock;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import net.ttddyy.book.libraryservice.checkout.limit.defaults.CheckoutLimitDefault;
 import net.ttddyy.book.libraryservice.checkout.limit.defaults.CheckoutLimitDefaultRepository;
@@ -25,6 +30,7 @@ import net.ttddyy.book.libraryservice.checkout.limit.schedule.CheckoutLimitSched
 import net.ttddyy.book.libraryservice.checkout.limit.schedule.CheckoutLimitScheduleRepository;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,21 +62,48 @@ public class CheckoutLimitService {
 		this.maxDays = maxDays;
 	}
 
-	public CheckoutLimit getCheckoutLimit(String schoolId, int grade) {
-		// check scheduled limit
+	public List<CheckoutLimit> getEffectiveCheckoutLimits(String schoolId, @Nullable LocalDate date) {
+		if (date == null) {
+			date = LocalDate.now(this.clock);
+		}
+		List<CheckoutLimitSchedule> schedules = this.limitScheduleRepository.findAllByScheduleDateAndSchoolId(date,
+				schoolId);
+		List<CheckoutLimitDefault> defaults = this.limitDefaultRepository.findAllBySchoolId(schoolId);
+
+		Map<Integer, CheckoutLimitSchedule> scheduleByGrade = schedules.stream()
+			.collect(Collectors.toMap(CheckoutLimitSchedule::getGrade, limit -> limit));
+
+		List<CheckoutLimit> result = new ArrayList<>();
+		for (CheckoutLimitDefault schoolDefault : defaults) {
+			int grade = schoolDefault.getGrade();
+			CheckoutLimitSchedule scheduled = scheduleByGrade.get(grade);
+			CheckoutLimit limit = determineEffectiveLimit(grade, scheduled, () -> schoolDefault);
+			result.add(limit);
+		}
+		return result;
+	}
+
+	public CheckoutLimit getEffectiveCheckoutLimit(String schoolId, int grade) {
 		LocalDate today = LocalDate.now(this.clock);
 		CheckoutLimitSchedule schedule = this.limitScheduleRepository.findByScheduleDateAndSchoolIdAndGrade(today,
 				schoolId, grade);
-		if (schedule != null) {
-			return new CheckoutLimit(schedule.getMaxBooks(), schedule.getMaxDays());
+		return determineEffectiveLimit(grade, schedule,
+				() -> this.limitDefaultRepository.findBySchoolIdAndGrade(schoolId, grade));
+	}
+
+	private CheckoutLimit determineEffectiveLimit(int grade, @Nullable CheckoutLimitSchedule scheduled,
+			// with jspecify: Supplier<@Nullable CheckoutLimitDefault>
+			Supplier<CheckoutLimitDefault> defaultLimitSupplier) {
+		// pick the scheduled if exists
+		if (scheduled != null) {
+			return new CheckoutLimit(grade, scheduled.getMaxBooks(), scheduled.getMaxDays());
 		}
-		// check school default
-		CheckoutLimitDefault schoolDefault = this.limitDefaultRepository.findBySchoolIdAndGrade(schoolId, grade);
-		if (schoolDefault != null) {
-			return new CheckoutLimit(schoolDefault.getMaxBooks(), schoolDefault.getMaxDays());
+		CheckoutLimitDefault defaultLimit = defaultLimitSupplier.get();
+		if (defaultLimit != null) {
+			return new CheckoutLimit(grade, defaultLimit.getMaxBooks(), defaultLimit.getMaxDays());
 		}
 		// fallback to the system default
-		return new CheckoutLimit(this.maxBooks, this.maxDays);
+		return new CheckoutLimit(grade, this.maxBooks, this.maxDays);
 	}
 
 }

@@ -18,6 +18,7 @@
 package net.ttddyy.book.libraryservice.checkout.limit.schedule;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.ListPagingAndSortingRepository;
@@ -33,5 +34,7 @@ public interface CheckoutLimitScheduleRepository extends JpaRepository<CheckoutL
 
 	@Nullable
 	CheckoutLimitSchedule findByScheduleDateAndSchoolIdAndGrade(LocalDate date, String schoolId, int grade);
+
+	List<CheckoutLimitSchedule> findAllByScheduleDateAndSchoolId(LocalDate date, String schoolId);
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 the original author or authors.
+ * Copyright 2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,21 @@
 
 package net.ttddyy.book.libraryservice.checkout.limit;
 
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
+
+import java.util.List;
+
 /**
- * Hold checkout limit information.
- *
  * @author Tadaya Tsuyukubo
  */
-public record CheckoutLimit(int grade, int maxBooks, int maxDays) {
+@Mapper
+public interface CheckoutLimitMapper {
+
+	CheckoutLimitMapper INSTANCE = Mappers.getMapper(CheckoutLimitMapper.class);
+
+	CheckoutLimitDto toDto(CheckoutLimit limit);
+
+	List<CheckoutLimitDto> toDtoList(List<CheckoutLimit> entities);
+
 }

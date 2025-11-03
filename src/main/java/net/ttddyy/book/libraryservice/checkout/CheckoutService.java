@@ -63,9 +63,9 @@ public class CheckoutService {
 	@Transactional
 	public void checkout(String schoolId, long memberId, Set<Long> bookIds, boolean force) {
 		Member member = this.memberRepository.getReferenceById(memberId);
-		CheckoutLimit checkoutLimit = this.checkoutLimitService.getCheckoutLimit(schoolId, member.getGrade());
-		int maxBooks = checkoutLimit.getMaxBooks();
-		int maxDays = checkoutLimit.getMaxDays();
+		CheckoutLimit checkoutLimit = this.checkoutLimitService.getEffectiveCheckoutLimit(schoolId, member.getGrade());
+		int maxBooks = checkoutLimit.maxBooks();
+		int maxDays = checkoutLimit.maxDays();
 		LocalDate dueDate = LocalDate.now().plusDays(maxDays);
 
 		if (!force) {

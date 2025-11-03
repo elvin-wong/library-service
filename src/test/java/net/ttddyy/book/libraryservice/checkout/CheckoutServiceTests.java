@@ -58,7 +58,7 @@ class CheckoutServiceTests {
 		MemberRepository memberRepository = mock(MemberRepository.class);
 		CheckoutLimitService checkoutLimitService = mock(CheckoutLimitService.class);
 
-		CheckoutLimit limit = new CheckoutLimit(6, 3);
+		CheckoutLimit limit = new CheckoutLimit(0, 6, 3);
 
 		Member member = new Member();
 		member.setGrade(1);
@@ -68,7 +68,7 @@ class CheckoutServiceTests {
 		// mock as if the member has currently 5 books checkouts
 		given(checkoutRepository.countByIdMemberId(memberId)).willReturn(5L);
 		given(memberRepository.getReferenceById(memberId)).willReturn(member);
-		given(checkoutLimitService.getCheckoutLimit(schoolId, member.getGrade())).willReturn(limit);
+		given(checkoutLimitService.getEffectiveCheckoutLimit(schoolId, member.getGrade())).willReturn(limit);
 
 		CheckoutService checkoutService = new CheckoutService(clock, checkoutRepository, memberRepository,
 				checkoutLimitService);

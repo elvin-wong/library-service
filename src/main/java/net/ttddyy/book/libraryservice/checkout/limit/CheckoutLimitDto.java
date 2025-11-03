@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 the original author or authors.
+ * Copyright 2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,5 @@
 
 package net.ttddyy.book.libraryservice.checkout.limit;
 
-/**
- * Hold checkout limit information.
- *
- * @author Tadaya Tsuyukubo
- */
-public record CheckoutLimit(int grade, int maxBooks, int maxDays) {
+public record CheckoutLimitDto(int grade, int maxBooks, int maxDays) {
 }

@@ -22,6 +22,8 @@ import org.springframework.data.repository.ListPagingAndSortingRepository;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * @author Tadaya Tsuyukubo
  */
@@ -31,5 +33,7 @@ public interface CheckoutLimitDefaultRepository
 
 	@Nullable
 	CheckoutLimitDefault findBySchoolIdAndGrade(String schoolId, int grade);
+
+	List<CheckoutLimitDefault> findAllBySchoolId(String schoolId);
 
 }

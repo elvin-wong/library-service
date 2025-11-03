@@ -16,25 +16,22 @@
 
 package net.ttddyy.book.libraryservice.checkout.limit;
 
-import java.time.Clock;
-import java.time.Instant;
-import java.time.ZoneOffset;
-
 import net.ttddyy.book.libraryservice.checkout.limit.defaults.CheckoutLimitDefault;
 import net.ttddyy.book.libraryservice.checkout.limit.defaults.CheckoutLimitDefaultRepository;
 import net.ttddyy.book.libraryservice.checkout.limit.schedule.CheckoutLimitSchedule;
 import net.ttddyy.book.libraryservice.checkout.limit.schedule.CheckoutLimitScheduleRepository;
 import org.junit.jupiter.api.Test;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.*;
 
 /**
  * Tests for {@link CheckoutLimitService}.
@@ -44,7 +41,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 class CheckoutLimitServiceTests {
 
 	@Test
-	void getCheckoutLimit() {
+	void getEffectiveCheckoutLimit() {
 		Clock clock = Clock.fixed(Instant.parse("2022-12-01T00:00:00.00Z"), ZoneOffset.UTC);
 		CheckoutLimitDefaultRepository defaultRepository = mock(CheckoutLimitDefaultRepository.class);
 		CheckoutLimitScheduleRepository scheduleRepository = mock(CheckoutLimitScheduleRepository.class);
@@ -56,10 +53,10 @@ class CheckoutLimitServiceTests {
 		// resolved by system default
 		given(scheduleRepository.findByScheduleDateAndSchoolIdAndGrade(any(), anyString(), anyInt())).willReturn(null);
 		given(defaultRepository.findBySchoolIdAndGrade(any(), anyInt())).willReturn(null);
-		result = checkoutLimitService.getCheckoutLimit("my-school", 0);
+		result = checkoutLimitService.getEffectiveCheckoutLimit("my-school", 0);
 		assertThat(result).isNotNull();
-		assertThat(result.getMaxBooks()).isEqualTo(2);
-		assertThat(result.getMaxDays()).isEqualTo(15);
+		assertThat(result.maxBooks()).isEqualTo(2);
+		assertThat(result.maxDays()).isEqualTo(15);
 		verify(scheduleRepository).findByScheduleDateAndSchoolIdAndGrade(any(), anyString(), anyInt());
 		verify(defaultRepository).findBySchoolIdAndGrade(any(), anyInt());
 
@@ -72,11 +69,11 @@ class CheckoutLimitServiceTests {
 		given(scheduleRepository.findByScheduleDateAndSchoolIdAndGrade(any(), anyString(), anyInt())).willReturn(null);
 		given(defaultRepository.findBySchoolIdAndGrade(any(), anyInt())).willReturn(defaultEntity);
 
-		result = checkoutLimitService.getCheckoutLimit("my-school", 0);
+		result = checkoutLimitService.getEffectiveCheckoutLimit("my-school", 0);
 
 		assertThat(result).isNotNull();
-		assertThat(result.getMaxBooks()).isEqualTo(10);
-		assertThat(result.getMaxDays()).isEqualTo(20);
+		assertThat(result.maxBooks()).isEqualTo(10);
+		assertThat(result.maxDays()).isEqualTo(20);
 		verify(scheduleRepository).findByScheduleDateAndSchoolIdAndGrade(any(), anyString(), anyInt());
 		verify(defaultRepository).findBySchoolIdAndGrade(any(), anyInt());
 
@@ -89,13 +86,98 @@ class CheckoutLimitServiceTests {
 		given(scheduleRepository.findByScheduleDateAndSchoolIdAndGrade(any(), anyString(), anyInt()))
 			.willReturn(scheduledEntity);
 
-		result = checkoutLimitService.getCheckoutLimit("my-school", 0);
+		result = checkoutLimitService.getEffectiveCheckoutLimit("my-school", 0);
 
 		assertThat(result).isNotNull();
-		assertThat(result.getMaxBooks()).isEqualTo(100);
-		assertThat(result.getMaxDays()).isEqualTo(200);
+		assertThat(result.maxBooks()).isEqualTo(100);
+		assertThat(result.maxDays()).isEqualTo(200);
 		verify(scheduleRepository).findByScheduleDateAndSchoolIdAndGrade(any(), anyString(), anyInt());
 		verifyNoInteractions(defaultRepository);
+	}
+
+	@Test
+	void getEffectiveCheckoutLimitsDefault() {
+		Clock clock = Clock.fixed(Instant.parse("2022-12-01T00:00:00.00Z"), ZoneOffset.UTC);
+		CheckoutLimitDefaultRepository defaultRepository = mock(CheckoutLimitDefaultRepository.class);
+		CheckoutLimitScheduleRepository scheduleRepository = mock(CheckoutLimitScheduleRepository.class);
+
+		given(scheduleRepository.findAllByScheduleDateAndSchoolId(any(), anyString())).willReturn(List.of());
+
+		CheckoutLimitDefault defaultEntity = new CheckoutLimitDefault();
+		defaultEntity.setGrade(1);
+		defaultEntity.setMaxBooks(20);
+		defaultEntity.setMaxDays(200);
+		given(defaultRepository.findAllBySchoolId(anyString())).willReturn(List.of(defaultEntity));
+
+		CheckoutLimitService service = new CheckoutLimitService(clock, defaultRepository, scheduleRepository, 1, 1);
+		List<CheckoutLimit> result = service.getEffectiveCheckoutLimits("my-school", null);
+
+		verify(scheduleRepository).findAllByScheduleDateAndSchoolId(eq(LocalDate.parse("2022-12-01")), eq("my-school"));
+		verify(defaultRepository).findAllBySchoolId(eq("my-school"));
+		assertThat(result).hasSize(1).first().satisfies(limit -> {
+			assertThat(limit.grade()).isEqualTo(1);
+			assertThat(limit.maxBooks()).isEqualTo(20);
+			assertThat(limit.maxDays()).isEqualTo(200);
+		});
+	}
+
+	@Test
+	void getEffectiveCheckoutLimitsScheduledOverride() {
+		Clock clock = Clock.fixed(Instant.parse("2022-12-01T00:00:00.00Z"), ZoneOffset.UTC);
+		CheckoutLimitDefaultRepository defaultRepository = mock(CheckoutLimitDefaultRepository.class);
+		CheckoutLimitScheduleRepository scheduleRepository = mock(CheckoutLimitScheduleRepository.class);
+
+		CheckoutLimitSchedule scheduledEntity = new CheckoutLimitSchedule();
+		scheduledEntity.setGrade(1);
+		scheduledEntity.setMaxBooks(10);
+		scheduledEntity.setMaxDays(100);
+		given(scheduleRepository.findAllByScheduleDateAndSchoolId(any(), anyString()))
+			.willReturn(List.of(scheduledEntity));
+
+		CheckoutLimitDefault defaultEntity = new CheckoutLimitDefault();
+		defaultEntity.setGrade(1);
+		defaultEntity.setMaxBooks(20);
+		defaultEntity.setMaxDays(200);
+		given(defaultRepository.findAllBySchoolId(anyString())).willReturn(List.of(defaultEntity));
+
+		CheckoutLimitService service = new CheckoutLimitService(clock, defaultRepository, scheduleRepository, 1, 1);
+		List<CheckoutLimit> result = service.getEffectiveCheckoutLimits("my-school", null);
+
+		verify(scheduleRepository).findAllByScheduleDateAndSchoolId(eq(LocalDate.parse("2022-12-01")), eq("my-school"));
+		verify(defaultRepository).findAllBySchoolId(eq("my-school"));
+		assertThat(result).hasSize(1).first().satisfies(limit -> {
+			assertThat(limit.grade()).isEqualTo(1);
+			assertThat(limit.maxBooks()).isEqualTo(10);
+			assertThat(limit.maxDays()).isEqualTo(100);
+		});
+	}
+
+	@Test
+	void getEffectiveCheckoutLimitsWithDate() {
+		Clock clock = Clock.fixed(Instant.parse("2022-12-01T00:00:00.00Z"), ZoneOffset.UTC);
+		CheckoutLimitDefaultRepository defaultRepository = mock(CheckoutLimitDefaultRepository.class);
+		CheckoutLimitScheduleRepository scheduleRepository = mock(CheckoutLimitScheduleRepository.class);
+
+		given(scheduleRepository.findAllByScheduleDateAndSchoolId(any(), anyString())).willReturn(List.of());
+
+		CheckoutLimitDefault defaultEntity = new CheckoutLimitDefault();
+		defaultEntity.setGrade(1);
+		defaultEntity.setMaxBooks(20);
+		defaultEntity.setMaxDays(200);
+		given(defaultRepository.findAllBySchoolId(anyString())).willReturn(List.of(defaultEntity));
+
+		CheckoutLimitService service = new CheckoutLimitService(clock, defaultRepository, scheduleRepository, 1, 1);
+
+		LocalDate date = LocalDate.parse("2022-12-01");
+		List<CheckoutLimit> result = service.getEffectiveCheckoutLimits("my-school", date);
+
+		verify(scheduleRepository).findAllByScheduleDateAndSchoolId(eq(date), eq("my-school"));
+		verify(defaultRepository).findAllBySchoolId(eq("my-school"));
+		assertThat(result).hasSize(1).first().satisfies(limit -> {
+			assertThat(limit.grade()).isEqualTo(1);
+			assertThat(limit.maxBooks()).isEqualTo(20);
+			assertThat(limit.maxDays()).isEqualTo(200);
+		});
 	}
 
 }
