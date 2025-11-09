@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 the original author or authors.
+ * Copyright 2024-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,6 +88,8 @@ public class BookService {
 		if (categoryId != null) {
 			BookCategory category = new BookCategory();
 			category.setId(categoryId);
+			// Workaround not to include the c-code column in the query.
+			// TODO: the c-code handling needs a rethink.
 			category.setCCodeDigits(null);
 			book.setCategory(category);
 		}
