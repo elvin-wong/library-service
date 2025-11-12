@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 the original author or authors.
+ * Copyright 2024-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,9 @@
 
 package net.ttddyy.book.libraryservice.book.category;
 
+import jakarta.persistence.*;
+
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import jakarta.persistence.AttributeConverter;
-import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.Version;
-
-import org.springframework.util.StringUtils;
 
 /**
  * Entity class for book categories.
@@ -59,8 +47,7 @@ public class BookCategory {
 	private String schoolId;
 
 	@Column(name = "ccode_content_digits")
-	@Convert(converter = CCodeContentDigitConverter.class)
-	private Set<String> cCodeDigits = new HashSet<>();
+	private String cCodeDigits;
 
 	@Column(insertable = false, updatable = false)
 	private Instant createdAt;
@@ -116,11 +103,11 @@ public class BookCategory {
 		this.schoolId = schoolId;
 	}
 
-	public Set<String> getCCodeDigits() {
+	public String getCCodeDigits() {
 		return this.cCodeDigits;
 	}
 
-	public void setCCodeDigits(Set<String> cCodeDigits) {
+	public void setCCodeDigits(String cCodeDigits) {
 		this.cCodeDigits = cCodeDigits;
 	}
 
@@ -138,28 +125,6 @@ public class BookCategory {
 
 	public void setUpdatedAt(Instant updatedAt) {
 		this.updatedAt = updatedAt;
-	}
-
-	/**
-	 * Convert comma delimited String to a Set.
-	 */
-	static class CCodeContentDigitConverter implements AttributeConverter<Set<String>, String> {
-
-		@Override
-		public String convertToDatabaseColumn(Set<String> attribute) {
-			// NOTE: this is readonly. Need to consider ordering when we support write.
-			return attribute.stream().collect(Collectors.joining(","));
-		}
-
-		@Override
-		public Set<String> convertToEntityAttribute(String dbData) {
-			// NOTE: the column is non-null and default empty string
-			if (!StringUtils.hasText(dbData)) {
-				return new HashSet<>();
-			}
-			return Arrays.stream(dbData.split(",")).collect(Collectors.toSet());
-		}
-
 	}
 
 }

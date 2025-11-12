@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 the original author or authors.
+ * Copyright 2024-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
 
 package net.ttddyy.book.libraryservice.book.category;
 
-import java.util.Set;
-
 /**
  * Book category DTO.
  *
@@ -30,7 +28,7 @@ public record BookCategoryDto(
 		long endingId,
 		String description,
 		String schoolId,
-		Set<String> cCodeDigits  // lo
+		String cCodeDigits
 // @formatter:on
 ) {
 }

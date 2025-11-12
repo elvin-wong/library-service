@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 the original author or authors.
+ * Copyright 2024-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,12 @@
 
 package net.ttddyy.book.libraryservice.book.category;
 
-import java.util.List;
-
-import net.ttddyy.book.libraryservice.checkout.history.CheckoutHistory;
-import net.ttddyy.book.libraryservice.checkout.history.CheckoutHistoryDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
-
 import org.springframework.data.domain.Page;
+
+import java.util.List;
 
 /**
  * @author Tadaya Tsuyukubo

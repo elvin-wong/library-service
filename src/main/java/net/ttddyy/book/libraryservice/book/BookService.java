@@ -16,12 +16,9 @@
 
 package net.ttddyy.book.libraryservice.book;
 
-import java.time.Clock;
-
 import net.ttddyy.book.libraryservice.book.category.BookCategory;
 import net.ttddyy.book.libraryservice.book.category.BookCategoryRepository;
 import org.hibernate.Hibernate;
-
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
@@ -30,6 +27,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+
+import java.time.Clock;
 
 import static org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers.ignoreCase;
 
@@ -88,9 +87,6 @@ public class BookService {
 		if (categoryId != null) {
 			BookCategory category = new BookCategory();
 			category.setId(categoryId);
-			// Workaround not to include the c-code column in the query.
-			// TODO: the c-code handling needs a rethink.
-			category.setCCodeDigits(null);
 			book.setCategory(category);
 		}
 		ExampleMatcher matcher = ExampleMatcher.matching()

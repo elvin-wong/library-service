@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 the original author or authors.
+ * Copyright 2024-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
 
 package net.ttddyy.book.libraryservice.book.category;
 
-import java.util.Set;
-
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,13 +28,12 @@ class BookCategoryMapperTests {
 	@Test
 	void toDtoWithCCodeDigits() {
 		BookCategory category = new BookCategory();
-		assertThat(category.getCCodeDigits()).isEmpty();
 		BookCategoryDto dto = BookCategoryMapper.INSTANCE.toDto(category);
-		assertThat(dto.cCodeDigits()).isEmpty();
+		assertThat(dto.cCodeDigits()).isNull();
 
-		category.setCCodeDigits(Set.of("foo", "bar"));
+		category.setCCodeDigits("foo,bar");
 		dto = BookCategoryMapper.INSTANCE.toDto(category);
-		assertThat(dto.cCodeDigits()).containsExactlyInAnyOrder("foo", "bar");
+		assertThat(dto.cCodeDigits()).isEqualTo("foo,bar");
 	}
 
 }
