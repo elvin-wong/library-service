@@ -1,4 +1,11 @@
 
+-- populate num_checkouts in books
+CREATE TRIGGER trigger_checkouts_insert
+    AFTER INSERT ON checkouts
+    FOR EACH ROW
+    EXECUTE FUNCTION update_books_num_checkouts();
+
+
 -- populate checkouts_history
 CREATE TRIGGER trigger_audit_checkouts
     AFTER INSERT OR UPDATE OR DELETE ON checkouts

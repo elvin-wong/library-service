@@ -27,4 +27,15 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+
+CREATE OR REPLACE FUNCTION update_books_num_checkouts()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE books
+    SET num_checkouts = num_checkouts + 1
+    WHERE id = NEW.book_id;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
 -- ^^^ END OF SCRIPT ^^^
