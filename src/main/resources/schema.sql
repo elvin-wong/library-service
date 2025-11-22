@@ -7,8 +7,8 @@ CREATE TABLE schools
     id         VARCHAR(8)   NOT NULL PRIMARY KEY,
     version    INT          NOT NULL DEFAULT 0,
     name       VARCHAR(100) NOT NULL,
-    created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 
@@ -23,8 +23,8 @@ CREATE TABLE book_categories
     description          VARCHAR(32)  NOT NULL DEFAULT '',
     school_id            VARCHAR(8)   NOT NULL DEFAULT '',
     ccode_content_digits VARCHAR(256) NOT NULL DEFAULT '',
-    created_at           TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at           TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at           TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at           TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT uc_book_categories__letter UNIQUE (letter),
     CONSTRAINT fk_book_categories__school_id FOREIGN KEY (school_id) REFERENCES schools (id)
 );
@@ -40,15 +40,15 @@ CREATE TABLE books
     isbn            VARCHAR(32)  NOT NULL,
     comments        VARCHAR(511),
     publisher       VARCHAR(256) NOT NULL,
-    date_added      TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+    date_added      TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP,
     status          VARCHAR(20)  NOT NULL DEFAULT 'AVAILABLE',
     status_changed_at  TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     num_checkouts   INT          NOT NULL DEFAULT 0,
     version         INT          NOT NULL DEFAULT 0,
     book_category_id INT         NOT NULL,
     school_id       VARCHAR(8)   NOT NULL,
-    created_at      TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at      TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at      TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (book_category_id) REFERENCES book_categories (id),
     FOREIGN KEY (school_id) REFERENCES schools (id)
 );
@@ -60,14 +60,14 @@ CREATE TABLE book_status_history
     old_status   VARCHAR(20),
     new_status   VARCHAR(20) NOT NULL,
     reason       VARCHAR(255),
-    changed_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    changed_at   TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (book_id) REFERENCES books (id)
 );
 
 CREATE TABLE members
 (
      id           INT         NOT NULL PRIMARY KEY,
-     date_added   TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+     date_added   TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
      active       BOOLEAN     NOT NULL DEFAULT TRUE,
      class_number INT,
      grade        INT         NOT NULL DEFAULT 99,
@@ -76,7 +76,7 @@ CREATE TABLE members
      firstname    VARCHAR(64),
      lastname     VARCHAR(64),
      school_id    VARCHAR(8),
-     updated_at   TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP
+     updated_at   TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 
@@ -86,8 +86,8 @@ CREATE TABLE checkouts
     book_id       INT  NOT NULL,
     checkout_date DATE NOT NULL,
     due_date      DATE NOT NULL,
-    created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (member_id, book_id),
     UNIQUE (book_id),
     FOREIGN KEY (member_id) REFERENCES members (id),
@@ -100,10 +100,10 @@ CREATE TABLE checkouts_history
     book_id       INT,
     checkout_date DATE,
     due_date      DATE,
-    created_at    TIMESTAMP,
-    updated_at    TIMESTAMP,
+    created_at    TIMESTAMPTZ,
+    updated_at    TIMESTAMPTZ,
     operation     TEXT NOT NULL,       -- 'INSERT', 'UPDATE', or 'DELETE'
-    changed_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    changed_at    TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX idx_checkouts_history_member_id ON checkouts_history(member_id);
 CREATE INDEX idx_checkouts_history_book_id ON checkouts_history(book_id);
@@ -124,8 +124,8 @@ CREATE TABLE activities
     book_id     INT         NOT NULL,
     member_id   INT,
     action_type VARCHAR(30) NOT NULL,
-    created_at  TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at  TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at  TIMESTAMPTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMPTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE checkout_limit_defaults
@@ -136,8 +136,8 @@ CREATE TABLE checkout_limit_defaults
     grade      INT        NOT NULL,
     max_books  INT        NOT NULL,
     max_days   INT        NOT NULL,
-    created_at TIMESTAMP  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT uc_checkout_limit_defaults__school_grade UNIQUE (school_id, grade),
     CONSTRAINT fk_checkout_limit_defaults__schools_id FOREIGN KEY (school_id) REFERENCES schools (id)
 );
@@ -151,8 +151,8 @@ CREATE TABLE checkout_limit_schedules
     schedule_date DATE       NOT NULL,
     max_books     INT        NOT NULL,
     max_days      INT        NOT NULL,
-    created_at    TIMESTAMP  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at    TIMESTAMP  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at    TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT uc_checkout_limit_schedules__school_grade_date UNIQUE (school_id, grade, schedule_date),
     CONSTRAINT fk_checkout_limit_schedules__schools_id FOREIGN KEY (school_id) REFERENCES schools (id)
 );
